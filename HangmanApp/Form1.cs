@@ -1,23 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace HangmanApp
 {
     public partial class FormMain : Form
     {
-        private List<string> Words = new List<string>();
-        private List<WordItem> Letters = new List<WordItem>();
-        private List<char> correctLetters = new List<char>();
-        string word = string.Empty;
-        int guesses = 7;
-        bool isGameInSession = false;
+        private List<string> _Words = new List<string>();
+        private List<WordItem> _Letters = new List<WordItem>();
+        string _word = string.Empty;
+        int _guesses = 7;
+        bool _isGameInSession = false;
 
         public FormMain()
         {
@@ -36,7 +32,7 @@ namespace HangmanApp
             if (isLetterPresentInWord)
             {
                 //replace _ with a letter
-                var pressedLetter = Letters.Where(x => x.Letter == letterPressed);
+                var pressedLetter = _Letters.Where(x => x.Letter == letterPressed);
                 var listOfDashes = lblCurrentWord.Text.Split(' ');
 
                 foreach (var item in pressedLetter)
@@ -51,7 +47,7 @@ namespace HangmanApp
                 lblCurrentWord.Text = currentText;
             }
 
-            var isGameNotFinished = Letters.Any(x => x.IsGuesed == false);
+            var isGameNotFinished = _Letters.Any(x => x.IsGuesed == false);
             if (isGameNotFinished) return;
 
             EnableButtons(false);
@@ -68,14 +64,14 @@ namespace HangmanApp
             }
             else
             {
-                guesses--;
-                lblGuesses.Text = guesses + " Remaining Guesses";
+                _guesses--;
+                lblGuesses.Text = _guesses + " Remaining Guesses";
             }
         }
 
         private void MarkGuessedLetters(char letterPressed)
         {
-            var listOfMatchingLetters = Letters.Where(x => x.Letter == letterPressed);
+            var listOfMatchingLetters = _Letters.Where(x => x.Letter == letterPressed);
             foreach (var item in listOfMatchingLetters)
             {
                 item.IsGuesed = true;
@@ -84,7 +80,7 @@ namespace HangmanApp
 
         private bool IsLetterInWord(char letterPressed)
         {
-            var result = from w in Letters
+            var result = from w in _Letters
                          where w.Letter == letterPressed
                          select w.Letter;
 
@@ -93,12 +89,12 @@ namespace HangmanApp
 
         private void BtnNewGame_Click(object sender, EventArgs e)
         {
-            isGameInSession = true;
+            _isGameInSession = true;
             this.lblMessage.Text = "";
 
-            Words.Add("Apple");
-            Words.Add("Orange");
-            Words.Add("Peach");
+            _Words.Add("Apple");
+            _Words.Add("Orange");
+            _Words.Add("Peach");
 
             StartNewGame();
 
@@ -107,21 +103,21 @@ namespace HangmanApp
         private void StartNewGame()
         {
             Random rnd = new Random();
-            var indexToPlay = rnd.Next(0, Words.Count);
-            word = Words[indexToPlay];
+            var indexToPlay = rnd.Next(0, _Words.Count);
+            _word = _Words[indexToPlay];
             lblCurrentWord.Text = "";
             CreateUnderscoreList();
             CreateListOfLetters();
-            if (isGameInSession) EnableButtons(true);
-            lblWordGuessing.Text = word;
+            if (_isGameInSession) EnableButtons(true);
+            lblWordGuessing.Text = _word;
         }
 
         private void CreateListOfLetters()
         {
             int i = 0;
-            foreach (var l in word.ToLower())
+            foreach (var l in _word.ToLower())
             {
-                Letters.Add(new
+                _Letters.Add(new
                     WordItem
                 { Letter = l, IsGuesed = false, Index = i });
                 i++;
@@ -130,7 +126,7 @@ namespace HangmanApp
 
         private void CreateUnderscoreList()
         {
-            for (int i = 0; i < word.Length; i++)
+            for (int i = 0; i < _word.Length; i++)
             {
                 lblCurrentWord.Text += "_ ";
             }
@@ -160,7 +156,7 @@ namespace HangmanApp
 
         private void PromptUserToStartAGame()
         {
-            if (!isGameInSession)
+            if (!_isGameInSession)
             {
                 lblMessage.Text = "Please start a new game to play";
                 lblMessage.ForeColor = Color.Red;
